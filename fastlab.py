@@ -95,6 +95,3 @@ def get_histogram(image):
     b_histogram = numpy.pad(b_histogram, (0, max_length - len(b_histogram)), mode='constant')
 
     return r_histogram.tolist(), g_histogram.tolist(), b_histogram.tolist()
-
-
-def c
