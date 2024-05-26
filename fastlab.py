@@ -21,8 +21,7 @@ def read_root():
     return {"Hello": "World"}
 
 @app.post("/image_form", response_class=HTMLResponse)
-async def make_image(request: Request,
-                     noise_level: float = Form(),  # Добавлен уровень шума
+async def make_image(noise_level: float = Form(),  # Добавлен уровень шума
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),
                      resp: str = Form()):
     recaptcha_secret = "6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3"
@@ -73,7 +72,7 @@ async def make_image(request: Request,
             original_histogram_images.append(original_histogram_image_path)
             noisy_histogram_images.append(noisy_histogram_image_path)
 
-    return templates.TemplateResponse("forms.html", {"request": request, "ready": ready, "images": images,
+    return templates.TemplateResponse("forms.html", {"ready": ready, "images": images,
                                                      "original_histogram_images": original_histogram_images,
                                                      "noisy_histogram_images": noisy_histogram_images})
 
