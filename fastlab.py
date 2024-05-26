@@ -85,6 +85,7 @@ async def make_image(request: Request,
                                                          "original_histogram_images": original_histogram_images,
                                                          "rotated_histogram_images": rotated_histogram_images})
 
+    return templates.TemplateResponse("forms.html", {"request": request, "ready": ready})
 
 def get_histogram(image):
     pixels = numpy.array(image)
