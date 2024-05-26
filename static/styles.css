@@ -1,0 +1,67 @@
+h2 {
+    color: GreenYellow;
+    font-family: Arial, sans-serif;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+h3 {
+    color: GreenYellow;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.g-recaptcha {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.number-input-container input[type="number"] {
+    margin-top: 20px;
+    text-align: center;
+    outline: none;
+    background-color: #ADFF2F;
+    border: none;
+    color: white;
+    margin-bottom: 20px;
+}
+
+button {
+  margin-top: 20px;
+  position: absolute;
+  left: 10%;
+  transform: translate(-50%, -50%);
+  background-color: #ADFF2F;
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;/
+}
+
+button:hover {
+  background-color: #7CFC00;
+}
+
+button:active {
+  background-color: #2e6a31;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+table td img {
+  margin-top: 60px;
+}
+
+
+
