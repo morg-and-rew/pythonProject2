@@ -28,9 +28,6 @@
         <div class="number-input-container">
             <input type="number" id="angle" name="angle" value="0">
         </div>
-        <div class="number-input-container">
-            <input type="number" id="noise_level" name="noise_level" value="0" step="0.1"> <!-- Добавлен уровень шума -->
-        </div>
         <div class="file-input-container">
             <input name="files" type="file" multiple>
         </div>
@@ -54,8 +51,6 @@
     <img src="{{ original_histogram_images[0] }}" alt="Original Histogram">
     <h3>Гистограмма повернутого изображения</h3>
     <img src="{{ rotated_histogram_images[0] }}" alt="Rotated Histogram">
-    <h3>Гистограмма шумного изображения</h3> <!-- Добавлена гистограмма для шумного изображения -->
-    <img src="{{ noisy_histogram_images[0] }}" alt="Noisy Histogram"> <!-- Добавлена гистограмма для шумного изображения -->
     {% endif %}
 </body>
 </html>

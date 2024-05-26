@@ -14,29 +14,24 @@ from pathlib import Path
 
 app = FastAPI()
 
-
-def sum_two_args(x, y):
-    return x + y
-
+def sum_two_args(x,y):
+ return x+y
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
-
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-
 @app.get("/some_url/{something}", response_class=HTMLResponse)
 async def read_something(request: Request, something: str):
-    return templates.TemplateResponse("forms.html", {"request": request, "something": something})
+    return templates.TemplateResponse("forms.html", {"request": request,"something": something})
 
-
+#1
 @app.post("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request,
                      angle: int = Form(),
-                     noise_level: float = Form(),  # Добавлен уровень шума
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),
                      resp: str = Form()):
     recaptcha_secret = "6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3"  # Замените на ваш секретный ключ reCAPTCHA
@@ -47,6 +42,7 @@ async def make_image(request: Request,
     recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"
     recaptcha_verification = requests.post(recaptcha_url, data=recaptcha_data)
     recaptcha_result = recaptcha_verification.json()
+
     if not recaptcha_result['success']:
         raise HTTPException(status_code=400, detail="Ошибка проверки капчи")
 
@@ -55,50 +51,40 @@ async def make_image(request: Request,
     if len(files) > 0:
         if len(files[0].filename) > 0:
             ready = True
-
     images = []
     original_histogram_images = []
     rotated_histogram_images = []
-    noisy_histogram_images = []  # Добавлены изображения гистограмм для шумных изображений
-
     if ready:
         print([file.filename.encode('utf-8') for file in files])
         images = ["static/" + hashlib.sha256(file.filename.encode('utf-8')).hexdigest() for file in files]
+
         content = [await file.read() for file in files]
+
         p_images = [Image.open(io.BytesIO(con)).convert("RGB") for con in content]
+
         for i in range(len(p_images)):
             rotated_image = p_images[i].rotate(angle, expand=True)
+
             original_histogram = get_histogram(p_images[i])
             rotated_histogram = get_histogram(rotated_image)
 
-            # Добавление шума к изображению
-            noise = np.random.normal(0, noise_level, p_images[i].size)  # Генерация шума
-            noisy_image = np.clip(p_images[i] + noise, 0, 255).astype(np.uint8)  # Добавление шума к изображению
-            noisy_histogram = get_histogram(noisy_image)
-
             rotated_image.save("./" + images[i], 'JPEG')
+
             original_histogram_image = create_histogram_image(original_histogram)
             rotated_histogram_image = create_histogram_image(rotated_histogram)
-            noisy_histogram_image = create_histogram_image(
-                noisy_histogram)  # Создание изображения гистограммы для шумного изображения
 
             original_histogram_image_path = f"static/original_histogram_{i}.png"
             rotated_histogram_image_path = f"static/rotated_histogram_{i}.png"
-            noisy_histogram_image_path = f"static/noisy_histogram_{i}.png"  # Путь к изображению гистограммы для шумного изображения
-
             original_histogram_image.save(original_histogram_image_path)
             rotated_histogram_image.save(rotated_histogram_image_path)
-            noisy_histogram_image.save(
-                noisy_histogram_image_path)  # Сохранение изображения гистограммы для шумного изображения
 
             original_histogram_images.append(original_histogram_image_path)
             rotated_histogram_images.append(rotated_histogram_image_path)
-            noisy_histogram_images.append(noisy_histogram_image_path)  # Добавление пути к изображению гистограммы для шумного изображения в список
 
         return templates.TemplateResponse("forms.html", {"request": request, "ready": ready, "images": images,
-                                                 "original_histogram_images": original_histogram_images,
-                                                 "rotated_histogram_images": rotated_histogram_images,
-                                                 "noisy_histogram_images": noisy_histogram_images})  # Добавление списка изображений гистограмм для шумных изображений в контекст
+                                                         "original_histogram_images": original_histogram_images,
+                                                         "rotated_histogram_images": rotated_histogram_images})
+
 
 def get_histogram(image):
     pixels = numpy.array(image)
