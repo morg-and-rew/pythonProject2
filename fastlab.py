@@ -14,8 +14,6 @@ from pathlib import Path
 
 app = FastAPI()
 
-
-
 def sum_two_args(x,y):
  return x+y
 
@@ -36,7 +34,7 @@ async def make_image(request: Request,
                      angle: int = Form(),
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),
                      resp: str = Form()):
-    recaptcha_secret = "6LdDV80pAAAAAJ7kIaFSs4mMADU3qSxAYUr92n0_"  # Замените на ваш секретный ключ reCAPTCHA
+    recaptcha_secret = "6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3"  # Замените на ваш секретный ключ reCAPTCHA
     recaptcha_data = {
         'secret': recaptcha_secret,
         'response': resp
