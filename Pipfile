@@ -4,8 +4,17 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+fastapi = "*"
+matplotlib = "*"
+uvicorn = "*"
+Pillow = "*"
+numpy = "*"
+requests = "*"
+typing-extensions = "*"
+pytest = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.12"
+

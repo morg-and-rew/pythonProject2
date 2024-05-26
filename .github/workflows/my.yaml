@@ -1,0 +1,31 @@
+name: 'test my project'
+on: [push]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Begin
+        uses: actions/checkout@v3
+      - name: Echo hello
+        run: echo "hello world"
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: Install pipenv
+        run: python -m pip install pipenv
+
+      - name: Pipenvlock
+        run: pipenv lock
+      - name: Pipenvsync
+        run: |
+          pipenv sync
+      - name: Start tests
+        run: pipenv run python -m pytest tests.py
+
+      - name: Deploy to Render.com
+        if: github.ref == 'refs/heads/master'
+        continue-on-error: true
+        run: |
+          run: |
+          curl -X GET https://api.render.com/deploy/srv-copo0jv79t8c73827q00?key=9mMcEhLTCes
