@@ -7,31 +7,18 @@ import requests
 from PIL import Image
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from fastapi.templating import Jinja2Templates  # Импорт Jinja2Templates
 import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 
 app = FastAPI()
 
-
-def sum_two_args(x, y):
-    return x + y
-
+templates = Jinja2Templates(directory="templates")  # Создание экземпляра Jinja2Templates
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
-
-
-@app.get("/some_url/{something}", response_class=HTMLResponse)
-async def read_something(request: Request, something: str):
-    return templates.TemplateResponse("forms.html", {"request": request, "something": something})
-
 
 @app.post("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request,
@@ -57,7 +44,6 @@ async def make_image(request: Request,
 
     images = []
     original_histogram_images = []
-    rotated_histogram_images = []
     noisy_histogram_images = []  # Добавлены изображения гистограмм для шумных изображений
 
     if ready:
@@ -66,9 +52,7 @@ async def make_image(request: Request,
         content = [await file.read() for file in files]
         p_images = [Image.open(io.BytesIO(con)).convert("RGB") for con in content]
         for i in range(len(p_images)):
-
             original_histogram = get_histogram(p_images[i])
-
 
             # Добавление шума к изображению
             noise = np.random.normal(0, noise_level, p_images[i].size)  # Генерация шума
@@ -79,8 +63,13 @@ async def make_image(request: Request,
             noisy_histogram_image = create_histogram_image(noisy_histogram)  # Создание изображения гистограммы для шумного изображения
 
             original_histogram_image_path = f"static/original_histogram_{i}.png"
-            rotated_histogram_image_path = f"static/rotated_histogram_{i}.png"
+            noisy_histogram_image_path = f"static/noisy_histogram_{i}.png"
+            original_histogram_images.append(original_histogram_image_path)
+            noisy_histogram_images.append(noisy_histogram_image_path)
 
+    return templates.TemplateResponse("forms.html", {"request": request, "ready": ready, "images": images,
+                                                     "original_histogram_images": original_histogram_images,
+                                                     "noisy_histogram_images": noisy_histogram_images})
 
 def get_histogram(image):
     pixels = np.array(image)
@@ -95,7 +84,6 @@ def get_histogram(image):
     b_histogram = np.pad(b_histogram, (0, max_length - len(b_histogram)), mode='constant')
 
     return r_histogram.tolist(), g_histogram.tolist(), b_histogram.tolist()
-
 
 def create_histogram_image(histograms):
     fig, ax = plt.subplots(figsize=(8, 6))
@@ -114,7 +102,6 @@ def create_histogram_image(histograms):
     plt.close()
     buf.seek(0)
     return Image.open(buf)
-
 
 @app.get("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request):
