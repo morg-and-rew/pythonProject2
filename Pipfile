@@ -12,7 +12,6 @@ numpy = "*"
 requests = "*"
 typing-extensions = "*"
 pytest = "*"
-jinja2 = "*"
 
 [dev-packages]
 
