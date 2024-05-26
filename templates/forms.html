@@ -1,56 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Какой-то сайт</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles.css">
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script>
-        var token = '';
 
-        var correctCaptcha = function(response) {
-            token = response;
-        };
-
-        function submitForm() {
-            if (token) {
-                document.getElementById('resp').value = token;
-                document.forms[0].submit();
-            } else {
-                alert('Пожалуйста, пройдите проверку reCAPTCHA.');
-            }
-        }
-    </script>
-</head>
-<body>
-    <h2>Зашумить твоё изображение</h2>
-    <form action="image_form" enctype="multipart/form-data" method="post">
-        <div class="number-input-container">
-            <input type="number" id="noise_level" name="noise_level" value="0" step="0.1"> <!-- Добавлен уровень шума -->
-        </div>
-        <div class="file-input-container">
-            <input name="files" type="file" multiple>
-        </div>
-        <input type="hidden" id="resp" name="resp">
-        <div class="form-group">
-            <div class="g-recaptcha" id="rcaptcha" data-sitekey="6LftbOgpAAAAAIfVbmHRARK-IlA25yXubizG5xgZ" data-callback="correctCaptcha"></div>
-        </div>
-        <button type="button" onclick="submitForm()">Зашумить</button>
-    </form>
-    {% if ready %}
-    <table>
-        {% for image in images %}
-        <tr>
-            <td>
-                <img src="{{ image }}">
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    <h3>Гистограмма исходного изображения</h3>
-    <img src="{{ original_histogram_images[0] }}" alt="Original Histogram">
-    <h3>Гистограмма зашумленного изображения</h3>
-    <img src="{{ noisy_histogram_images[0] }}" alt="Noisy Histogram">
-    {% endif %}
-</body>
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <title>Какой-то сайт</title> 
+    <link rel="stylesheet" type="text/css" href="/static/styles.css"> 
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script> 
+    <script> 
+        var token = ''; 
+ 
+        var correctCaptcha = function(response) { 
+            token = response; 
+        }; 
+ 
+        function submitForm() { 
+            if (token) { 
+                document.getElementById('resp').value = token; 
+                document.forms[0].submit(); 
+            } else { 
+                alert('Пожалуйста, пройдите проверку reCAPTCHA.'); 
+            } 
+        } 
+    </script> 
+</head> 
+<body> 
+    <h2>Зашумить твоё изображение</h2> 
+    <form action="image_form" enctype="multipart/form-data" method="post"> 
+        <div class="number-input-container"> 
+            <input type="number" id="noise_level" name="noise_level" value="0" step="0.1"> <!-- Добавлен уровень шума --> 
+            <input type="number" id="angle" name="angle" value="0" step="0.1"> <!-- Добавлен угол --> 
+        </div> 
+        <div class="file-input-container"> 
+            <input name="files" type="file" multiple> 
+        </div> 
+        <input type="hidden" id="resp" name="resp"> 
+        <div class="form-group"> 
+            <div class="g-recaptcha" id="rcaptcha" data-sitekey="6LftbOgpAAAAAIfVbmHRARK-IlA25yXubizG5xgZ" data-callback="correctCaptcha"></div> 
+        </div> 
+        <button type="button" onclick="submitForm()">Зашумить</button> 
+    </form> 
+    {% if ready %} 
+    <table> 
+        {% for image in images %} 
+        <tr> 
+            <td> 
+                <img src="{{ image }}"> 
+            </td> 
+        </tr> 
+        {% endfor %} 
+    </table> 
+    <h3>Гистограмма исходного изображения</h3> 
+    <img src="{{ original_histogram_images[0] }}" alt="Original Histogram"> 
+    <h3>Гистограмма зашумленного изображения</h3> 
+    <img src="{{ noisy_histogram_images[0] }}" alt="Noisy Histogram"> 
+    {% endif %} 
+</body> 
 </html>
