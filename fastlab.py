@@ -30,7 +30,7 @@ async def make_image(request: Request,
                      angle: int = Form(),
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),
                      resp: str = Form()):
-    recaptcha_secret = "6LewH-MpAAAAAB9QYtuymjNuElGmY4-BZWP_gqBG"  # Замените на ваш секретный ключ reCAPTCHA
+    recaptcha_secret = "6LdDV80pAAAAAJ7kIaFSs4mMADU3qSxAYUr92n0_"  # Замените на ваш секретный ключ reCAPTCHA
     recaptcha_data = {
         'secret': recaptcha_secret,
         'response': resp
@@ -95,3 +95,27 @@ def get_histogram(image):
     b_histogram = numpy.pad(b_histogram, (0, max_length - len(b_histogram)), mode='constant')
 
     return r_histogram.tolist(), g_histogram.tolist(), b_histogram.tolist()
+
+
+def create_histogram_image(histograms):
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    ax.bar(numpy.arange(0, len(histograms[0]) * 10, 10), histograms[0], color='r', width=10, label='Red')
+    ax.bar(numpy.arange(0, len(histograms[1]) * 10, 10), histograms[1], color='g', width=10, label='Green')
+    ax.bar(numpy.arange(0, len(histograms[2]) * 10, 10), histograms[2], color='b', width=10, label='Blue')
+    ax.set_title('Гистограмма распределения цветов')
+    ax.set_xlabel('Значение пиксилей')
+    ax.set_ylabel('Частота')
+    ax.grid(True)
+    ax.legend()
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return Image.open(buf)
+
+
+@app.get("/image_form", response_class=HTMLResponse)
+async def make_image(request: Request):
+    return templates.TemplateResponse("forms.html", {"request": request})
