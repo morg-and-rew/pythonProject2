@@ -35,7 +35,6 @@ async def read_something(request: Request, something: str):
 
 @app.post("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request,
-                     angle: int = Form(),
                      noise_level: float = Form(),  # Добавлен уровень шума
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),
                      resp: str = Form()):
@@ -67,20 +66,17 @@ async def make_image(request: Request,
         content = [await file.read() for file in files]
         p_images = [Image.open(io.BytesIO(con)).convert("RGB") for con in content]
         for i in range(len(p_images)):
-            rotated_image = p_images[i].rotate(angle, expand=True)
+
             original_histogram = get_histogram(p_images[i])
-            rotated_histogram = get_histogram(rotated_image)
+
 
             # Добавление шума к изображению
             noise = np.random.normal(0, noise_level, p_images[i].size)  # Генерация шума
             noisy_image = np.clip(p_images[i] + noise, 0, 255).astype(np.uint8)  # Добавление шума к изображению
             noisy_histogram = get_histogram(noisy_image)
 
-            rotated_image.save("./" + images[i], 'JPEG')
             original_histogram_image = create_histogram_image(original_histogram)
-            rotated_histogram_image = create_histogram_image(rotated_histogram)
-            noisy_histogram_image = create_histogram_image(
-                noisy_histogram)  # Создание изображения гистограммы для шумного изображения
+            noisy_histogram_image = create_histogram_image(noisy_histogram)  # Создание изображения гистограммы для шумного изображения
 
             original_histogram_image_path = f"static/original_histogram_{i}.png"
             rotated_histogram_image_path = f"static/rotated_histogram_{i}.png"
