@@ -24,6 +24,10 @@ def read_root():
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+@app.get("/some_url/{something}", response_class=HTMLResponse)
+async def read_something(request: Request, something: str):
+    return templates.TemplateResponse("forms.html", {"request": request,"something": something})
+
 #1
 @app.post("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request,
