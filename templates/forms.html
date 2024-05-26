@@ -23,19 +23,19 @@
     </script>
 </head>
 <body>
-    <h2>Поверну твоё изображение</h2>
+    <h2>Зашумить твоё изображение</h2>
     <form action="image_form" enctype="multipart/form-data" method="post">
         <div class="number-input-container">
-            <input type="number" id="angle" name="angle" value="0">
+            <input type="number" id="noise_level" name="noise_level" value="0" step="0.1"> <!-- Добавлен уровень шума -->
         </div>
         <div class="file-input-container">
             <input name="files" type="file" multiple>
         </div>
         <input type="hidden" id="resp" name="resp">
         <div class="form-group">
-            <div class="g-recaptcha" id="rcaptcha" data-6LftbOgpAAAAAIfVbmHRARK-IlA25yXubizG5xgZdata-callback="correctCaptcha"></div>
+            <div class="g-recaptcha" id="rcaptcha" data-sitekey="6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3" data-callback="correctCaptcha"></div>
         </div>
-        <button type="button" onclick="submitForm()">Повернуть</button>
+        <button type="button" onclick="submitForm()">Зашумить</button>
     </form>
     {% if ready %}
     <table>
@@ -49,8 +49,8 @@
     </table>
     <h3>Гистограмма исходного изображения</h3>
     <img src="{{ original_histogram_images[0] }}" alt="Original Histogram">
-    <h3>Гистограмма повернутого изображения</h3>
-    <img src="{{ rotated_histogram_images[0] }}" alt="Rotated Histogram">
+    <h3>Гистограмма зашумленного изображения</h3>
+    <img src="{{ noisy_histogram_images[0] }}" alt="Noisy Histogram">
     {% endif %}
 </body>
 </html>
