@@ -28,7 +28,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/some_url/{something}", response_class=HTMLResponse)
 async def read_something(request: Request, something: str):
-    return templates.TemplateResponse("forms.html", {"request": request,"something": something})
+    return templates.TemplateResponse("C:\Users\andre\PycharmProjects\pythonProject2\templates\forms.html", {"request": request,"something": something})
 
 #1
 @app.post("/image_form", response_class=HTMLResponse)
