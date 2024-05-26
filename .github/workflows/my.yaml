@@ -28,4 +28,4 @@ jobs:
         continue-on-error: true
         run: |
           run: |
-          curl -X GET https://api.render.com/deploy/srv-copo0jv79t8c73827q00?key=9mMcEhLTCes
+          curl -X GET https://api.render.com/deploy/srv-cp9blqv109ks73a6cckg?key=ae8VjGFKaI8
