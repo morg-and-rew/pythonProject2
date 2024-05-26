@@ -1,20 +1,20 @@
 from fastapi import FastAPI, Request, Form, HTTPException, File, UploadFile
 from typing import List
 import hashlib
-import numpy as np
+import numpy as np  # Импорт numpy как np
 import io
 import requests
 from PIL import Image
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from fastapi.templating import Jinja2Templates  # Импорт Jinja2Templates
 import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="templates")  # Создание экземпляра Jinja2Templates
 
 @app.get("/")
 def read_root():
@@ -22,10 +22,10 @@ def read_root():
 
 @app.post("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request,
-                     brightness_level: float = Form(),  # Добавлен уровень яркости
+                     noise_level: float = Form(),  # Добавлен уровень шума
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),
                      resp: str = Form()):
-    recaptcha_secret = "6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3"
+    recaptcha_secret = "6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3"  # Замените на ваш секретный ключ reCAPTCHA
     recaptcha_data = {
         'secret': recaptcha_secret,
         'response': resp
@@ -37,42 +37,39 @@ async def make_image(request: Request,
         raise HTTPException(status_code=400, detail="Ошибка проверки капчи")
 
     ready = False
+    print(len(files))
     if len(files) > 0:
         if len(files[0].filename) > 0:
             ready = True
 
     images = []
     original_histogram_images = []
-    brightened_histogram_images = []
+    noisy_histogram_images = []  # Добавлены изображения гистограмм для шумных изображений
 
     if ready:
+        print([file.filename.encode('utf-8') for file in files])
         images = ["static/" + hashlib.sha256(file.filename.encode('utf-8')).hexdigest() for file in files]
         content = [await file.read() for file in files]
         p_images = [Image.open(io.BytesIO(con)).convert("RGB") for con in content]
         for i in range(len(p_images)):
             original_histogram = get_histogram(p_images[i])
 
-            # Изменение яркости изображения
-            brightened_image = np.clip((p_images[i] * (1 + brightness_level)), 0, 255).astype(np.uint8)
-            brightened_histogram = get_histogram(brightened_image)
-
-            p_images[i].save("./" + images[i], 'JPEG')
-            brightened_image.save("./" + images[i], 'JPEG')
+            # Добавление шума к изображению
+            noise = np.random.normal(0, noise_level, p_images[i].size)  # Генерация шума
+            noisy_image = np.clip(p_images[i] + noise, 0, 255).astype(np.uint8)  # Добавление шума к изображению
+            noisy_histogram = get_histogram(noisy_image)
 
             original_histogram_image = create_histogram_image(original_histogram)
-            brightened_histogram_image = create_histogram_image(brightened_histogram)
+            noisy_histogram_image = create_histogram_image(noisy_histogram)  # Создание изображения гистограммы для шумного изображения
 
             original_histogram_image_path = f"static/original_histogram_{i}.png"
-            brightened_histogram_image_path = f"static/brightened_histogram_{i}.png"
-            original_histogram_image.save(original_histogram_image_path)
-            brightened_histogram_image.save(brightened_histogram_image_path)
-
+            noisy_histogram_image_path = f"static/noisy_histogram_{i}.png"
             original_histogram_images.append(original_histogram_image_path)
-            brightened_histogram_images.append(brightened_histogram_image_path)
+            noisy_histogram_images.append(noisy_histogram_image_path)
 
     return templates.TemplateResponse("forms.html", {"request": request, "ready": ready, "images": images,
                                                      "original_histogram_images": original_histogram_images,
-                                                     "brightened_histogram_images": brightened_histogram_images})
+                                                     "noisy_histogram_images": noisy_histogram_images})
 
 def get_histogram(image):
     pixels = np.array(image)
