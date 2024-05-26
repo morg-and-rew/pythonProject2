@@ -27,7 +27,7 @@ templates = Jinja2Templates(directory="templates")
 #1
 @app.post("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request,
-                     noise_level: int = Form(),
+                     angle: int = Form(),
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),
                      resp: str = Form()):
     recaptcha_secret = "6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3"  # Замените на ваш секретный ключ reCAPTCHA
@@ -59,7 +59,7 @@ async def make_image(request: Request,
         p_images = [Image.open(io.BytesIO(con)).convert("RGB") for con in content]
 
         for i in range(len(p_images)):
-            rotated_image = p_images[i].rotate(noise_level, expand=True)
+            rotated_image = p_images[i].rotate(angle, expand=True)
 
             original_histogram = get_histogram(p_images[i])
             rotated_histogram = get_histogram(rotated_image)
