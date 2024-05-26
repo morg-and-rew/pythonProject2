@@ -25,7 +25,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def make_image(request: Request,
                      noise_level: float = Form(),
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),
-                     angle: int = Form(),  # Добавлено поле 'angle'
                      resp: str = Form()):
     recaptcha_secret = "6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3"
 
@@ -57,19 +56,22 @@ async def make_image(request: Request,
 
     for i in range(len(p_images)):
         # Применено вращение изображения на угол 'angle'
-        p_images[i] = p_images[i].rotate(angle)
 
         original_histogram = get_histogram(p_images[i])
         noise = np.random.normal(0, noise_level, p_images[i].size)
         noisy_image = np.clip(p_images[i] + noise, 0, 255).astype(np.uint8)
         noisy_histogram = get_histogram(noisy_image)
         noisy_image.save("./" + images[i], 'JPEG')
+
         original_histogram_image = create_histogram_image(original_histogram)
         noisy_histogram_image = create_histogram_image(noisy_histogram)
+
         original_histogram_image_path = f"static/original_histogram_{i}.png"
         noisy_histogram_image_path = f"static/noisy_histogram_{i}.png"
+
         original_histogram_image.save(original_histogram_image_path)
         noisy_histogram_image.save(noisy_histogram_image_path)
+
         original_histogram_images.append(original_histogram_image_path)
         noisy_histogram_images.append(noisy_histogram_image_path)
 
