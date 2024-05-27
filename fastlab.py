@@ -12,21 +12,27 @@ import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 
+#Создаем экземпляр FastAPI и Jinja2Templates для работы с шаблонами HTML.
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+#Определяем маршрут для корневого URL ("/"), который возвращает простой JSON-ответ "Hello World".
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
+#Монтируем статические файлы (изображения, CSS, JS) из директории "static", чтобы они были доступны через URL "/static".
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+#Определяем маршрут для обработки POST-запроса на "/image_form"
 @app.post("/image_form", response_class=HTMLResponse)
-async def make_image(request: Request,
-                     noise_level: float = Form(),
-                     files: List[UploadFile] = File(description="Multiple files as UploadFile"),
-                     resp: str = Form()):
+async def make_image(request: Request, #объект Запрос доступа к данным запроса
+                     noise_level: float = Form(),#уровень шума, передаваемый из формы
+                     files: List[UploadFile] = File(description="Multiple files as UploadFile"),#список загруженных файлов изображений
+                     resp: str = Form()):#токен reCAPTCHA, передаваемый из формы
 
+    #проверяем токен reCAPTCHA, полученный из формы.
+    #Если проверка не пройдена, возвращаем ошибку 400 (Bad Request) с сообщением "Ошибка проверки капчи".
     recaptcha_secret = "6LftbOgpAAAAAC8YIIB3p2x0s58eEnrzx-5Sw9t3"
 
     recaptcha_data = {
@@ -41,48 +47,58 @@ async def make_image(request: Request,
     if not recaptcha_result['success']:
         raise HTTPException(status_code=400, detail="Ошибка проверки капчи")
 
+    #Проверяем, были ли загружены файлы. Если да, то устанавливаем флаг ready в True.
     ready = False
     if len(files) > 0:
         if len(files[0].filename) > 0:
             ready = True
 
+    #Генерируем уникальные имена для сохранения изображений в директории "static".
     images = []
     original_histogram_images = []
     noisy_histogram_images = []
 
     if ready:
+        #Читаем содержимое загруженных файлов и открываем их как изображения PIL.
         images = ["static/" + hashlib.sha256(file.filename.encode('utf-8')).hexdigest() for file in files]
         content = [await file.read() for file in files]
         p_images = [Image.open(io.BytesIO(con)).convert("RGB") for con in content]
 
         for i in range(len(p_images)):
-            # Применено вращение изображения на угол 'angle'
-
+            #Вычисляем гистограмму оригинального изображения.
             original_histogram = get_histogram(p_images[i])
             noise = np.random.normal(0, noise_level, (p_images[i].size[0],p_images[i].size[1],3))
 
+            #Генерируем шум с заданным уровнем и добавляем его к изображению.
             noisy_image = np.clip(p_images[i] + np.rot90(noise), 0, 255).astype(np.uint8)
             noisy_histogram = get_histogram(noisy_image)
 
+            #Вычисляем гистограмму зашумленного изображения.
             image_with_noise = Image.fromarray(noisy_image)
             image_with_noise.save(images[i]+'.jpg')
 
+            #Сохраняем зашумленное изображение в директории "static".
             original_histogram_image = create_histogram_image(original_histogram)
             noisy_histogram_image = create_histogram_image(noisy_histogram)
 
+            #Создаем изображения гистограмм оригинального и зашумленного изображений.
             original_histogram_image_path = f"static/original_histogram_{i}.png"
             noisy_histogram_image_path = f"static/noisy_histogram_{i}.png"
 
+            #Сохраняем изображения гистограмм в директории "static".
             original_histogram_image.save(original_histogram_image_path)
             noisy_histogram_image.save(noisy_histogram_image_path)
 
             original_histogram_images.append(original_histogram_image_path)
             noisy_histogram_images.append(noisy_histogram_image_path)
 
+        #Возвращаем отрендеренный шаблон "forms.html" с необходимыми данными
         return templates.TemplateResponse("forms.html", {"request": request, "ready": ready, "images": [image + '.jpg' for image in images],
                                                        "original_histogram_images": original_histogram_images,
                                                        "noisy_histogram_images": noisy_histogram_images})
 
+#Функция get_histogram вычисляет гистограммы красного, зеленого и синего каналов изображения.
+# Она возвращает списки значений гистограмм для каждого канала.
 def get_histogram(image):
     pixels = np.array(image)
 
@@ -97,7 +113,8 @@ def get_histogram(image):
 
     return r_histogram.tolist(), g_histogram.tolist(), b_histogram.tolist()
 
-
+#Функция create_histogram_image создает изображение гистограммы на основе переданных значений гистограмм для каждого канала.
+# Она возвращает объект PIL. Изображение, содержащее изображение гистограммы.
 def create_histogram_image(histograms):
     fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -116,7 +133,7 @@ def create_histogram_image(histograms):
     buf.seek(0)
     return Image.open(buf)
 
-
+#Определяем маршрут для GET-запроса на "/image_form", который возвращает отрендеренный шаблон "forms.html" с объектом Request.
 @app.get("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request):
     return templates.TemplateResponse("forms.html", {"request": request})
