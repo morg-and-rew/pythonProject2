@@ -16,6 +16,9 @@ from pathlib import Path
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+
+
+
 #Определяем маршрут для корневого URL ("/"), который возвращает простой JSON-ответ "Hello World".
 @app.get("/")
 def read_root():
