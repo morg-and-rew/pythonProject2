@@ -24,6 +24,11 @@ def read_root():
 #Монтируем статические файлы (изображения, CSS, JS) из директории "static", чтобы они были доступны через URL "/static".
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+#Определяем маршрут для GET-запроса на "/image_form", который возвращает отрендеренный шаблон "forms.html" с объектом Request.
+@app.get("/image_form", response_class=HTMLResponse)
+async def make_image(request: Request):
+    return templates.TemplateResponse("forms.html", {"request": request})
+
 #Определяем маршрут для обработки POST-запроса на "/image_form"
 @app.post("/image_form", response_class=HTMLResponse)
 async def make_image(request: Request, # объект Request, который предоставляет доступ к данным запроса, таким как заголовки, параметры URL, тело запроса и т.д.
@@ -133,7 +138,3 @@ def create_histogram_image(histograms):
     buf.seek(0)
     return Image.open(buf)
 
-#Определяем маршрут для GET-запроса на "/image_form", который возвращает отрендеренный шаблон "forms.html" с объектом Request.
-@app.get("/image_form", response_class=HTMLResponse)
-async def make_image(request: Request):
-    return templates.TemplateResponse("forms.html", {"request": request})
