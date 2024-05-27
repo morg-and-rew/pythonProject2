@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 
-#Создаем экземпляр FastAPI и Jinja2Templates для работы с шаблонами HTML.
+#Создаем экземпляр класса FastAPI и Jinja2Templates для работы с шаблонами HTML.
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
@@ -26,7 +26,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 #Определяем маршрут для обработки POST-запроса на "/image_form"
 @app.post("/image_form", response_class=HTMLResponse)
-async def make_image(request: Request, #объект Запрос доступа к данным запроса
+async def make_image(request: Request, # объект Request, который предоставляет доступ к данным запроса, таким как заголовки, параметры URL, тело запроса и т.д.
                      noise_level: float = Form(),#уровень шума, передаваемый из формы
                      files: List[UploadFile] = File(description="Multiple files as UploadFile"),#список загруженных файлов изображений
                      resp: str = Form()):#токен reCAPTCHA, передаваемый из формы
