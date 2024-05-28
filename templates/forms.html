@@ -12,6 +12,7 @@
             token = response;
         };
 
+
         function submitForm() {
             if (token) {
                 document.getElementById('resp').value = token;
@@ -19,10 +20,6 @@
             } else {
                 alert('Пожалуйста, пройдите проверку reCAPTCHA.');
             }
-        }
-
-        function viewImage(imageName) {
-            window.location.href = `/view_image/${imageName}`;
         }
     </script>
 </head>
@@ -40,7 +37,6 @@
             <div class="g-recaptcha" id="rcaptcha" data-sitekey="6LftbOgpAAAAAIfVbmHRARK-IlA25yXubizG5xgZ" data-callback="correctCaptcha"></div>
         </div>
         <button type="button" onclick="submitForm()">Добавить шум</button>
-        <button type="button" onclick="viewImage('{{ images[0] }}')">Просмотреть изображение</button>
     </form>
     {% if ready %}
     <table>
