@@ -16,9 +16,6 @@ from pathlib import Path
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-
-
-
 #Определяем маршрут для корневого URL ("/"), который возвращает простой JSON-ответ "Hello World".
 @app.get("/")
 def read_root():
@@ -67,7 +64,7 @@ async def make_image(request: Request, # объект Request, который п
     noisy_histogram_images = []
 
     if ready:
-        #Читаем содержимое загруженных файлов и открываем их как изображения PIL.
+        #создают список имен файлов, которые будут использованы для загрузки файлов
         images = ["static/" + hashlib.sha256(file.filename.encode('utf-8')).hexdigest() for file in files]
         content = [await file.read() for file in files]
         p_images = [Image.open(io.BytesIO(con)).convert("RGB") for con in content]
@@ -75,17 +72,19 @@ async def make_image(request: Request, # объект Request, который п
         for i in range(len(p_images)):
             #Вычисляем гистограмму оригинального изображения.
             original_histogram = get_histogram(p_images[i])
-            noise = np.random.normal(0, noise_level, (p_images[i].size[0],p_images[i].size[1],3))
 
             #Генерируем шум с заданным уровнем и добавляем его к изображению.
+            noise = np.random.normal(0, noise_level, (p_images[i].size[0],p_images[i].size[1],3))
             noisy_image = np.clip(p_images[i] + np.rot90(noise), 0, 255).astype(np.uint8)
+
+            # Вычисляем гистограмму зашумленного изображения.
             noisy_histogram = get_histogram(noisy_image)
 
-            #Вычисляем гистограмму зашумленного изображения.
+            # Сохраняем зашумленное изображение в директории "static".
             image_with_noise = Image.fromarray(noisy_image)
             image_with_noise.save(images[i]+'.jpg')
 
-            #Сохраняем зашумленное изображение в директории "static".
+            # Создаем изображения гистограмм оригинального и зашумленного изображений.
             original_histogram_image = create_histogram_image(original_histogram)
             noisy_histogram_image = create_histogram_image(noisy_histogram)
 
@@ -96,7 +95,6 @@ async def make_image(request: Request, # объект Request, который п
             #Сохраняем изображения гистограмм в директории "static".
             original_histogram_image.save(original_histogram_image_path)
             noisy_histogram_image.save(noisy_histogram_image_path)
-
             original_histogram_images.append(original_histogram_image_path)
             noisy_histogram_images.append(noisy_histogram_image_path)
 
@@ -140,4 +138,3 @@ def create_histogram_image(histograms):
     plt.close()
     buf.seek(0)
     return Image.open(buf)
-
