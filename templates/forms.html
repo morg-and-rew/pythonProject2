@@ -41,7 +41,6 @@
             <div class="g-recaptcha" id="rcaptcha" data-sitekey="6LftbOgpAAAAAIfVbmHRARK-IlA25yXubizG5xgZ" data-callback="correctCaptcha"></div>
         </div>
         <button type="button" onclick="submitForm()">Добавить шум</button>
-        <button type="button" onclick="viewImage('{{ image_name[0] }}')">Просмотреть изображение</button>
     </form>
     {% if ready %}
     <table>
@@ -57,9 +56,6 @@
     <img src="{{ original_histogram_images[0] }}" alt="Original Histogram">
     <h3>Гистограмма зашумленного изображения</h3>
     <img src="{{ noisy_histogram_images[0] }}" alt="Noise Histogram">
-    <p>
-        <button onclick="window.open('/show_histogram', '_blank')">Показать гистограмму</button>
-    </p>
     {% endif %}
 </body>
 </html>
