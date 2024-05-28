@@ -16,7 +16,6 @@
         function submitForm() {
             if (token) {
                 document.getElementById('resp').value = token;
-                document.forms[0].submit();
             } else {
                 alert('Пожалуйста, пройдите проверку reCAPTCHA.');
             }
