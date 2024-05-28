@@ -5,7 +5,9 @@
     <title>Котик</title>
 </head>
 <body>
+    {% if view_image %}
     <h2>Изображение котика</h2>
     <img src="{{ view_image }}" alt="view_image">
+    {% endif %}
 </body>
 </html>
