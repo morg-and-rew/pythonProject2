@@ -83,7 +83,8 @@ async def make_image(request: Request,
 
         return templates.TemplateResponse("forms.html", {"request": request, "ready": ready, "images": [image + '.jpg' for image in images],
                                                        "original_histogram_images": original_histogram_images,
-                                                       "noisy_histogram_images": noisy_histogram_images})
+                                                       "noisy_histogram_images": noisy_histogram_images,
+                                                       "image_name": [image + '.jpg' for image in images]})
 
 @app.get("/view_image/{image_name}", response_class=HTMLResponse)
 async def view_image(request: Request, image_name: str):
