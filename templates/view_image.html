@@ -7,7 +7,6 @@
 </head>
 <body>
     <h2>Просмотр изображения</h2>
-    <img class="img-circle profile_img" src="{{ url_for('static', filename='images/{{ image_name }}.jpg' )}}" onerror="this.onerror=null;this.src='../static/images/{{ image_name }}.jpg';" />
-
+    <button type="button" onclick="viewImage('{{ image_name[0] }}')">Просмотреть изображение</button>
 </body>
 </html>
