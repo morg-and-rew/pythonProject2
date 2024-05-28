@@ -86,6 +86,11 @@ async def make_image(request: Request,
                                                          "original_histogram_images": original_histogram_images,
                                                          "noisy_histogram_images": noisy_histogram_images,})
 
+@app.get("/view_image", response_class=HTMLResponse)
+async def show_histogram(request: Request):
+    view_image = "static/view_image.png"
+    return templates.TemplateResponse("view_image.html", {"request": request, "view_image": view_image})
+
 def get_histogram(image):
     pixels = np.array(image)
 
